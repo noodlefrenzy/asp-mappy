@@ -5,8 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mappy.Models
+namespace MappyData
 {
+    public static class Constants
+    {
+        public const double SeattleLatitude = 47.5998;
+        public const double SeattleLongitude = -122.3346;
+    }
+
     /// <summary>
     /// GPS Point for a user, allows us to build up routes based on GPS snapshots.
     /// </summary>

@@ -1,4 +1,5 @@
-﻿using Microsoft.WindowsAzure;
+﻿using MappyData;
+using Microsoft.WindowsAzure;
 using System.Diagnostics;
 using System.Web;
 using System.Web.Http;
@@ -10,9 +11,6 @@ namespace Mappy
 {
     public class MvcApplication : HttpApplication
     {
-        public const double SeattleLatitude = 47.5998;
-        public const double SeattleLongitude = -122.3346;
-
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
@@ -22,7 +20,8 @@ namespace Mappy
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             // Fire and forget
-            RoutePointSourceFactory.StartAsync(AzureUtilities.FromConfiguration("RoutePointSource"));
+            RoutePointSourceFactory.StartAsync(AzureUtilities.FromConfiguration("RoutePointSource"), 
+                pt => RouteHub.Send(RouteHub.Hub(), pt.UserID, (float)pt.Latitude, (float)pt.Longitude));
         }
     }
 }

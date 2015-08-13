@@ -1,5 +1,4 @@
-﻿using Mappy.Models;
-using Microsoft.ServiceBus.Messaging;
+﻿using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -13,7 +12,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mappy
+namespace MappyData
 {
     public static class AzureUtilities
     {

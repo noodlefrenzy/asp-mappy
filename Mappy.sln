@@ -5,6 +5,10 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mappy", "Mappy\Mappy.csproj", "{9C9672F2-E9CC-4CD1-A9EC-8A710A0A6F2F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MappyData", "MappyData\MappyData.csproj", "{31357FD8-C5AD-41F7-AB88-CFF3C0028043}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MappyDataGenerator", "MappyDataGenerator\MappyDataGenerator.csproj", "{F8F60B76-1620-4845-9AEA-069BB1B2EB64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{9C9672F2-E9CC-4CD1-A9EC-8A710A0A6F2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C9672F2-E9CC-4CD1-A9EC-8A710A0A6F2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C9672F2-E9CC-4CD1-A9EC-8A710A0A6F2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31357FD8-C5AD-41F7-AB88-CFF3C0028043}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31357FD8-C5AD-41F7-AB88-CFF3C0028043}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31357FD8-C5AD-41F7-AB88-CFF3C0028043}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31357FD8-C5AD-41F7-AB88-CFF3C0028043}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8F60B76-1620-4845-9AEA-069BB1B2EB64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8F60B76-1620-4845-9AEA-069BB1B2EB64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8F60B76-1620-4845-9AEA-069BB1B2EB64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8F60B76-1620-4845-9AEA-069BB1B2EB64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

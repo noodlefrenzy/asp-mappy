@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MappyData;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -9,8 +10,8 @@ namespace Mappy.Controllers
     {
         public ActionResult Index()
         {
-            this.ViewBag.CenterLatitude = MvcApplication.SeattleLatitude;
-            this.ViewBag.CenterLongitude = MvcApplication.SeattleLongitude;
+            this.ViewBag.CenterLatitude = MappyData.Constants.SeattleLatitude;
+            this.ViewBag.CenterLongitude = MappyData.Constants.SeattleLongitude;
             this.ViewBag.MapsId = AzureUtilities.FromConfiguration("OpenStreetMapId");
             this.ViewBag.MapsAccessToken = AzureUtilities.FromConfiguration("OpenStreetMapAccessToken");
             return View();
