@@ -1,0 +1,79 @@
+﻿@section SPAViews {
+    @Html.Partial("_Home")
+}
+@section Scripts{
+    @Scripts.Render("~/bundles/knockout")
+<script src="~/Scripts/jquery.signalR-2.2.0.min.js"></script>
+<script src="~/signalr/hubs"></script>
+<script>
+    var centerLat = @ViewBag.CenterLatitude;
+    var centerLon = @ViewBag.CenterLongitude;
+    var zoom = 13;
+    var tightZoom = 16;
+    var map = L.map('map').setView([centerLat, centerLon], zoom);
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>[…]',
+        maxZoom: 18,
+        id: '@ViewBag.MapsId',
+        accessToken: '@ViewBag.MapsAccessToken'
+    }).addTo(map);
+
+    var layers = {
+        pathLRU: [],
+        path: {},
+        pathMarker: {},
+        pathHeatmap: {}
+    };
+
+    function dropLayers(layerMap) {
+        if (Object.keys(layerMap).length > 0) {
+            Object.keys(layerMap).forEach(function (k) {
+                map.removeLayer(layerMap[k]);
+                delete layerMap[k];
+            });
+        }
+    }
+    var maxPathLayers = 100;
+
+    $(function () {
+        //var iconUri = '/Content/Sports-Walking-icon.png';
+        var iconUri = '/Content/Sports-Walking-icon-white.png';
+        var endIcon = L.icon({
+            iconSize: [38, 38],
+            iconAnchor: [12, 12],
+            iconUrl: iconUri
+        });
+
+        var routeHub = $.connection.routeHub;
+        routeHub.client.newPoint = function (userid, lat, lon) {
+            if (!layers.pathHeatmap[0]) {
+                layers.pathHeatmap[0] = L.heatLayer([[lat, lon]]).addTo(map);
+            } else {
+                layers.pathHeatmap[0].addLatLng([lat, lon]);
+            }
+
+            if (layers.path[userid]) {
+                layers.pathLRU.splice(layers.pathLRU.indexOf(userid), 1);
+                layers.pathLRU.push(userid);
+                layers.path[userid].addLatLng([lat, lon]);
+                if (layers.pathMarker[userid]) map.removeLayer(layers.pathMarker[userid]);
+                layers.pathMarker[userid] = L.marker([lat, lon], { icon: endIcon }).addTo(map);
+            } else {
+                layers.pathLRU.push(userid);
+                layers.path[userid] = L.polyline([[lat, lon]], { color: chroma.random(), weight: 5 }).addTo(map);
+                layers.pathMarker[userid] = L.marker([lat, lon], { icon: endIcon }).addTo(map);
+                if (layers.pathLRU.length > maxPathLayers) {
+                    var discard = layers.pathLRU.unshift();
+                    map.removeLayer(layers.path[userid]);
+                    if (layers.pathMarker[userid]) map.removeLayer[userid];
+                    delete layers.path[userid];
+                    delete layers.pathMarker[userid];
+                }
+            }
+        };
+
+        $.connection.hub.start().done(function () {
+        });
+    });
+</script>
+}
