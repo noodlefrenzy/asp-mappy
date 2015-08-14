@@ -1,4 +1,7 @@
-﻿using System;
+﻿using MappyData;
+using Microsoft.ServiceBus.Messaging;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +13,35 @@ namespace MappyDataGenerator
     {
         static void Main(string[] args)
         {
+            WriteToEventHub();
+        }
+
+        static void WriteToEventHub()
+        {
+            var ehConnStr = AzureUtilities.ServiceBusConnectionString(
+                AzureUtilities.FromConfiguration("MappyServiceBusNamespace"),
+                AzureUtilities.FromConfiguration("MappyEventHubSASName"),
+                AzureUtilities.FromConfiguration("MappyEventHubSASKey"));
+            var eventHubName = AzureUtilities.FromConfiguration("MappyEventHubName");
+
+            var eventHubClient =
+                EventHubClient.CreateFromConnectionString(ehConnStr, eventHubName);
+
+            new RandomRoutePointSource(pt =>
+            {
+                Console.WriteLine("Sending {0}", pt);
+                var data = new EventData(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(pt)));
+                data.PartitionKey = pt.UserID;
+                eventHubClient.Send(data);
+            }).StartAsync().Wait();
+        }
+
+        static void WriteToStorage()
+        {
+            var storageConnStr = AzureUtilities.StorageConnectionString(
+                AzureUtilities.FromConfiguration("MappyStorageName"),
+                AzureUtilities.FromConfiguration("MappyStorageKey"));
+
         }
     }
 }

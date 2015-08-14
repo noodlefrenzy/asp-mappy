@@ -55,22 +55,39 @@ namespace MappyData
             var key = AzureUtilities.FromConfiguration(connectionStringOrKey ?? "StorageConnectionString");
             if (key == null)
             {
+                // NOTE: In the real world, you'd want to remove this, so you didn't log keys.
                 Trace.TraceInformation("Couldn't find '{0}' as setting, assuming it's the actual key.", connectionStringOrKey);
                 key = connectionStringOrKey;
             }
-
-            Trace.TraceInformation("Connecting to storage account '{0}'", key);
 
             var storageAccount = CloudStorageAccount.Parse(key);
 
             return storageAccount.CreateCloudTableClient();
         }
 
-        public static async Task<EventProcessorHost> AttachProcessorForHub(string processorName, string eventHubPath, string consumerGroupName, string eventHubConnectionKey, string offsetStorageConnectionKey, IEventProcessorFactory processorFactory)
+        public static string ServiceBusConnectionString(string serviceBusNamespace, string sharedAccessKeyName, string sharedAccessKey)
         {
-            var ehConn = AzureUtilities.FromConfiguration(eventHubConnectionKey);
-            var storageConn = AzureUtilities.FromConfiguration(offsetStorageConnectionKey);
-            var eventProcessorHost = new EventProcessorHost(processorName, eventHubPath, consumerGroupName, ehConn, storageConn);
+            return string.Format("Endpoint=sb://{0}.servicebus.windows.net/;SharedAccessKeyName={1};SharedAccessKey={2}",
+                serviceBusNamespace,
+                sharedAccessKeyName,
+                sharedAccessKey);
+        }
+
+        public static string StorageConnectionString(string storageName, string storageKey)
+        {
+            return string.Format("DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}",
+                storageName, storageKey);
+        }
+
+        public static async Task<EventProcessorHost> AttachProcessorForHub(
+            string processorName, 
+            string serviceBusConnectionString,
+            string offsetStorageConnectionString,
+            string eventHubName,
+            string consumerGroupName,
+            IEventProcessorFactory processorFactory)
+        {
+            var eventProcessorHost = new EventProcessorHost(processorName, eventHubName, consumerGroupName, serviceBusConnectionString, offsetStorageConnectionString);
             await eventProcessorHost.RegisterEventProcessorFactoryAsync(processorFactory);
 
             return eventProcessorHost;

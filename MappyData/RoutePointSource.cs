@@ -44,32 +44,30 @@ namespace MappyData
     {
         public EventHubRoutePointSource(Action<IRoutePoint> onNewPoint)
         {
-            this.EventHubConnectionKey = "EventHubConnectionString";
-            this.OffsetStorageConnectionKey = "StroeerDashConnectionString";
-            this.EventHubName = AzureUtilities.FromConfiguration("EventHubName");
-            this.ConsumerGroupName = AzureUtilities.FromConfiguration("ConsumerGroupName") ?? "$Default";
             this._onPoint = onNewPoint;
         }
 
         public async Task StartAsync()
         {
-            Trace.TraceInformation("Connecting to {0}/{1}/{2}, storing in {3}", this.EventHubConnectionKey, this.EventHubName, this.ConsumerGroupName, this.OffsetStorageConnectionKey);
+            var ehConnStr = AzureUtilities.ServiceBusConnectionString(
+                AzureUtilities.FromConfiguration("MappyServiceBusNamespace"),
+                AzureUtilities.FromConfiguration("MappyEventHubSASName"),
+                AzureUtilities.FromConfiguration("MappyEventHubSASKey"));
+            var storageConnStr = AzureUtilities.StorageConnectionString(
+                AzureUtilities.FromConfiguration("MappyStorageName"),
+                AzureUtilities.FromConfiguration("MappyStorageKey"));
+            var eventHubName = AzureUtilities.FromConfiguration("MappyEventHubName");
+            var consumerGroup = AzureUtilities.FromConfiguration("MappyConsumerGroupName") ?? "$Default";
+
+            Trace.TraceInformation("Connecting to {0}/{1}/{2}, storing in {3}", ehConnStr, eventHubName, consumerGroup, storageConnStr);
 
             var factory = new RoutePointProcessorFactory(item =>
             {
                 Trace.TraceInformation("From EH: {0} @ ({1}, {2})", item.UserID, item.Latitude, item.Longitude);
                 this._onPoint(item);
             });
-            await AzureUtilities.AttachProcessorForHub("stroeerdash", this.EventHubName, this.ConsumerGroupName, this.EventHubConnectionKey, this.OffsetStorageConnectionKey, factory);
+            await AzureUtilities.AttachProcessorForHub("mappy", ehConnStr, storageConnStr, eventHubName, consumerGroup, factory);
         }
-
-        private string EventHubConnectionKey { get; set; }
-
-        private string OffsetStorageConnectionKey { get; set; }
-
-        private string EventHubName { get; set; }
-
-        private string ConsumerGroupName { get; set; }
 
         private Action<IRoutePoint> _onPoint;
     }
