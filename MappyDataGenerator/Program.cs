@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace MappyDataGenerator
 {
+    /// <summary>
+    /// Simple program to write randomly-generated user paths to EventHub for testing the client.
+    /// </summary>
     class Program
     {
         static void Main(string[] args)
@@ -34,14 +37,6 @@ namespace MappyDataGenerator
                 data.PartitionKey = pt.UserID;
                 eventHubClient.Send(data);
             }).StartAsync().Wait();
-        }
-
-        static void WriteToStorage()
-        {
-            var storageConnStr = AzureUtilities.StorageConnectionString(
-                AzureUtilities.FromConfiguration("MappyStorageName"),
-                AzureUtilities.FromConfiguration("MappyStorageKey"));
-
         }
     }
 }

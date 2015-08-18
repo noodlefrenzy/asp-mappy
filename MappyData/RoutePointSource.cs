@@ -109,7 +109,7 @@ namespace MappyData
 
     public class RandomRoutePointSource
     {
-        public RandomRoutePointSource(Action<IRoutePoint> onNewPoint, int seed = 17, int millisBetweenPoints = 250, int numUsers = 10, double maxRangeLatLong = .5)
+        public RandomRoutePointSource(Action<IRoutePoint> onNewPoint, int seed = 17, int millisBetweenPoints = 100, int numUsers = 20, double maxRangeLatLong = .1)
         {
             this._random = new Random(seed);
             this._timeBetweenPoints = TimeSpan.FromMilliseconds(millisBetweenPoints);
@@ -148,8 +148,8 @@ namespace MappyData
             {
                 cur = new RoutePoint()
                 {
-                    Latitude = NextCoord(prev.Latitude, _maxRange / 500.0),
-                    Longitude = NextCoord(prev.Longitude, _maxRange / 500.0),
+                    Latitude = NextCoord(prev.Latitude, _maxRange / 100.0),
+                    Longitude = NextCoord(prev.Longitude, _maxRange / 100.0),
                     UserID = user.ToString(),
                     MeasurementTime = DateTime.UtcNow
                 };

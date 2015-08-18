@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 namespace Mappy.Controllers
 {
+    // Note that I've removed the [Authorize] attribute to disable auth (see also Startup.cs)
     public class HomeController : Controller
     {
         public ActionResult Index()

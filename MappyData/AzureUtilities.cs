@@ -14,19 +14,35 @@ using System.Threading.Tasks;
 
 namespace MappyData
 {
+    /// <summary>
+    /// A collection of Azure-related utilities, factored out here to let both the ASP.Net site and the CLI tool work with them.
+    /// </summary>
     public static class AzureUtilities
     {
         public const string DefaultRoutePointsTable = "routepoints";
         public const string RoutePointsTableKey = "RoutePointsTable";
 
+        // Cache the configuration data.
         private static ConcurrentDictionary<string, string> _ConfigurationEntries = new ConcurrentDictionary<string, string>();
         private static ConcurrentDictionary<string, CloudTable> _Tables = new ConcurrentDictionary<string, CloudTable>();
 
+        /// <summary>
+        /// Pulls configuration entries from either the CloudConfigurationManager (app/web.config or the cscfg if deployed) or the environment variable of the same name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>The found value, or null.</returns>
+        /// <remarks>Side-effect: Stores the result in the dictionary cache.</remarks>
         public static string FromConfiguration(string name)
         {
             return _ConfigurationEntries.GetOrAdd(name, x => CloudConfigurationManager.GetSetting(x) ?? Environment.GetEnvironmentVariable(name));
         }
 
+        /// <summary>
+        /// Get/create the Azure Table Storage table for route points.
+        /// </summary>
+        /// <param name="connectionStringKey"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
         public static CloudTable GetRoutePointsTable(string connectionStringKey = null, string tableName = null)
         {
             tableName = tableName ?? FromConfiguration(RoutePointsTableKey) ?? DefaultRoutePointsTable;
@@ -41,6 +57,13 @@ namespace MappyData
             });
         }
 
+        /// <summary>
+        /// Get all of the route points within a given timespan from the azure table storage table.
+        /// </summary>
+        /// <param name="routePointsTable"></param>
+        /// <param name="starting"></param>
+        /// <param name="ending"></param>
+        /// <returns></returns>
         public static IEnumerable<RoutePointTS> GetRoutePointsFromTo(CloudTable routePointsTable,
             DateTime starting, DateTime ending)
         {
@@ -79,6 +102,16 @@ namespace MappyData
                 storageName, storageKey);
         }
 
+        /// <summary>
+        /// Attach an event processor host to an event hub.
+        /// </summary>
+        /// <param name="processorName">Used in blob storage for grouping stored partition offsets into a container.</param>
+        /// <param name="serviceBusConnectionString">Full connection string to the service bus containing the hub.</param>
+        /// <param name="offsetStorageConnectionString">Full connection string to the storage stamp for storing offsets.</param>
+        /// <param name="eventHubName">Name of the event hub.</param>
+        /// <param name="consumerGroupName">Name of the consumer group (use $Default if you don't know).</param>
+        /// <param name="processorFactory">EventProcessorFactory instance.</param>
+        /// <returns></returns>
         public static async Task<EventProcessorHost> AttachProcessorForHub(
             string processorName, 
             string serviceBusConnectionString,
@@ -118,6 +151,9 @@ namespace MappyData
         private Action<IRoutePoint> onItemCB;
     }
 
+    /// <summary>
+    /// Processor for route points - stores offsets on every hundredth point.
+    /// </summary>
     public class RoutePointProcessor : IEventProcessor
     {
         public RoutePointProcessor(Action<IRoutePoint> onItem)

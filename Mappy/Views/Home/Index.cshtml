@@ -6,6 +6,7 @@
 <script src="~/Scripts/jquery.signalR-2.2.0.min.js"></script>
 <script src="~/signalr/hubs"></script>
 <script>
+    // Factor center lat/long, app ID and access token into ViewBag.
     var centerLat = @ViewBag.CenterLatitude;
     var centerLon = @ViewBag.CenterLongitude;
     var zoom = 13;
@@ -18,6 +19,8 @@
         accessToken: '@ViewBag.MapsAccessToken'
     }).addTo(map);
 
+    // Track different map layers using dictionaries by user ID, keep an LRU to "harvest" paths at a certain size.
+    // NOTE: In production, you should also harvest paths based on length, so we're not drawing too many points.
     var layers = {
         pathLRU: [],
         path: {},
@@ -25,18 +28,9 @@
         pathHeatmap: {}
     };
 
-    function dropLayers(layerMap) {
-        if (Object.keys(layerMap).length > 0) {
-            Object.keys(layerMap).forEach(function (k) {
-                map.removeLayer(layerMap[k]);
-                delete layerMap[k];
-            });
-        }
-    }
     var maxPathLayers = 100;
 
     $(function () {
-        //var iconUri = '/Content/Sports-Walking-icon.png';
         var iconUri = '/Content/Sports-Walking-icon-white.png';
         var endIcon = L.icon({
             iconSize: [38, 38],
@@ -44,14 +38,17 @@
             iconUrl: iconUri
         });
 
+        // Our SignalR hub
         var routeHub = $.connection.routeHub;
         routeHub.client.newPoint = function (userid, lat, lon) {
+            // Create or update the heatmap for the given user.
             if (!layers.pathHeatmap[0]) {
                 layers.pathHeatmap[0] = L.heatLayer([[lat, lon]]).addTo(map);
             } else {
                 layers.pathHeatmap[0].addLatLng([lat, lon]);
             }
-
+            
+            // Create or update the path and end marker for the given user.
             if (layers.path[userid]) {
                 layers.pathLRU.splice(layers.pathLRU.indexOf(userid), 1);
                 layers.pathLRU.push(userid);
@@ -62,6 +59,7 @@
                 layers.pathLRU.push(userid);
                 layers.path[userid] = L.polyline([[lat, lon]], { color: chroma.random(), weight: 5 }).addTo(map);
                 layers.pathMarker[userid] = L.marker([lat, lon], { icon: endIcon }).addTo(map);
+                // ... and if we have too many paths, harvest the last one from the LRU.
                 if (layers.pathLRU.length > maxPathLayers) {
                     var discard = layers.pathLRU.unshift();
                     map.removeLayer(layers.path[userid]);
@@ -72,6 +70,7 @@
             }
         };
 
+        // Start the hub client
         $.connection.hub.start().done(function () {
         });
     });

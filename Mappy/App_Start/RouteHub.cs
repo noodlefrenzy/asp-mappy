@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace Mappy
 {
+    /// <summary>
+    /// SignalR Hub for RoutePoint data. http://www.asp.net/signalr/overview/guide-to-the-api/hubs-api-guide-javascript-client for details.
+    /// </summary>
     public class RouteHub : Hub
     {
         public RouteHub()

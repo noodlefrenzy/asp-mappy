@@ -20,8 +20,10 @@ namespace Mappy
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             // Fire and forget
+            // Start the factory based on a configuration entry, and have the callback just send the incoming points through our SignalR hub.
             RoutePointSourceFactory.StartAsync(AzureUtilities.FromConfiguration("RoutePointSource"), 
                 pt => RouteHub.Send(RouteHub.Hub(), pt.UserID, (float)pt.Latitude, (float)pt.Longitude));
+            // Note the casts to floats - SignalR seems to have issues sending doubles to Javascript, possibly because JS doesn't support that precision.
         }
     }
 }

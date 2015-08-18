@@ -300,6 +300,7 @@
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\CollectionModelDescription.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
+    <Content Include="Scripts\chroma.LICENSE" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\chroma.min.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -359,6 +360,7 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
+    <Content Include="Scripts\leaflet-heat.LICENSE" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

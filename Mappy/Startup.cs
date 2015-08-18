@@ -12,7 +12,9 @@ namespace Mappy
     {
         public void Configuration(IAppBuilder app)
         {
+            // Disable auth...
             //ConfigureAuth(app);
+            // ... and enable SignalR
             app.MapSignalR();
         }
     }
